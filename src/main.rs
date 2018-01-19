@@ -279,56 +279,21 @@ impl Board {
     }
 
     fn mut_location_at(&mut self, label: char) -> &mut Location {
-       match label {
-           'a' => &mut self.foundations[0],
-           'b' => &mut self.foundations[1],
-           'c' => &mut self.foundations[2],
-           'd' => &mut self.foundations[3],
-           'e' => &mut self.columns[0],
-           'f' => &mut self.columns[1],
-           'g' => &mut self.columns[2],
-           'h' => &mut self.columns[3],
-           'i' => &mut self.columns[4],
-           'j' => &mut self.columns[5],
-           'k' => &mut self.columns[6],
-           'l' => &mut self.columns[7],
-           'm' => &mut self.columns[8],
-           'n' => &mut self.hand[0],
-           'o' => &mut self.hand[1],
-           'p' => &mut self.hand[2],
-           'q' => &mut self.hand[3],
-           'r' => &mut self.hand[4],
-           's' => &mut self.hand[5],
-           't' => &mut self.hand[6],
-           _   => panic!("Label outside range"),
-       }
+        match label {
+            'a' ... 'd' => &mut self.foundations[label as usize - 'a' as usize],
+            'e' ... 'm' => &mut self.columns[label as usize - 'e' as usize],
+            'n' ... 't' => &mut self.hand[label as usize - 'n' as usize],
+            _           => panic!("Label outside range"),
+        }
     }
 
-    // TODO DRY up with above.
     fn location_at(&self, label: char) -> &Location {
-       match label {
-           'a' => &self.foundations[0],
-           'b' => &self.foundations[1],
-           'c' => &self.foundations[2],
-           'd' => &self.foundations[3],
-           'e' => &self.columns[0],
-           'f' => &self.columns[1],
-           'g' => &self.columns[2],
-           'h' => &self.columns[3],
-           'i' => &self.columns[4],
-           'j' => &self.columns[5],
-           'k' => &self.columns[6],
-           'l' => &self.columns[7],
-           'm' => &self.columns[8],
-           'n' => &self.hand[0],
-           'o' => &self.hand[1],
-           'p' => &self.hand[2],
-           'q' => &self.hand[3],
-           'r' => &self.hand[4],
-           's' => &self.hand[5],
-           't' => &self.hand[6],
-           _   => panic!("Label outside range"),
-       }
+        match label {
+            'a' ... 'd' => &self.foundations[label as usize - 'a' as usize],
+            'e' ... 'm' => &self.columns[label as usize - 'e' as usize],
+            'n' ... 't' => &self.hand[label as usize - 'n' as usize],
+            _           => panic!("Label outside range"),
+        }
     }
 
     fn execute(&mut self, m: Move) {
