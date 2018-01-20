@@ -254,25 +254,19 @@ impl Board {
             Column { cards: Vec::new() },
             Column { cards: Vec::new() },
         ];
-        let mut hand = [
-            SpotInHand { card: None },
-            SpotInHand { card: None },
-            SpotInHand { card: None },
-            SpotInHand { card: None },
-            SpotInHand { card: None },
-            SpotInHand { card: None },
-            SpotInHand { card: None },
+        let hand = [
+            SpotInHand { card: Some(deck.deal()) },
+            SpotInHand { card: Some(deck.deal()) },
+            SpotInHand { card: Some(deck.deal()) },
+            SpotInHand { card: Some(deck.deal()) },
+            SpotInHand { card: Some(deck.deal()) },
+            SpotInHand { card: Some(deck.deal()) },
+            SpotInHand { card: Some(deck.deal()) },
         ];
 
-        for spot in hand.iter_mut() {
-            spot.move_to(deck.deal());
-        }
-
         for (i, column) in columns.iter_mut().enumerate() {
-            let mut j = 1;
-            while j != i + 2 {
+            for _ in 1..(i + 2) {
                 column.move_to(deck.deal());
-                j += 1;
             }
         }
         Board { foundations: foundations, columns: columns, hand: hand }
@@ -320,13 +314,11 @@ impl fmt::Display for Board {
         write!(f, "                           a    b    c    d\n")?;
         write!(f, "____________________________________________\n")?;
         write!(f, "                          {}  {}  {}  {}\n\n\n", fds[0], fds[1], fds[2], fds[3])?;
-        let mut i = 0;
         write!(f, "  e    f    g    h    i    j    k    l    m\n")?;
         write!(f, "____________________________________________\n")?;
-        loop {
-            if self.columns.iter().all(|c| c.cards.len() < i) {
-                break;
-            }
+
+        let mut i = 0;
+        while !self.columns.iter().all(|c| c.cards.len() < i) {
             write!(f, "{}  {}  {}  {}  {}  {}  {}  {}  {}\n",
                 self.columns[0].printable_card_at(i),
                 self.columns[1].printable_card_at(i),
@@ -340,6 +332,7 @@ impl fmt::Display for Board {
 
             i += 1;
         }
+
         write!(f, "\n")?;
         write!(f, "  n    o    p    q    r    s    t\n")?;
         write!(f, "____________________________________________\n")?;
