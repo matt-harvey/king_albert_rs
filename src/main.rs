@@ -207,15 +207,12 @@ struct Deck {
 
 impl Deck {
     fn new() -> Self {
-        // TODO Do this more nicely.
         let mut cards = Vec::new();
-        let mut rank = 1;
-        while rank != 14 {
+        for rank in 1..14 {
             cards.push(Card { rank: rank, suit: Suit::Spades });
             cards.push(Card { rank: rank, suit: Suit::Hearts });
             cards.push(Card { rank: rank, suit: Suit::Diamonds });
             cards.push(Card { rank: rank, suit: Suit::Clubs });
-            rank += 1;
         }
         Deck { cards: cards }
     }
