@@ -68,10 +68,10 @@ impl fmt::Display for Card {
 }
 
 trait Location {
-    fn can_move_to(&self, card: &Card) -> bool;
-    fn move_to(&mut self, card: Card);
-    fn can_move_from(&self) -> bool;
-    fn move_from(&mut self) -> Card;
+    fn can_receive(&self, card: &Card) -> bool;
+    fn receive(&mut self, card: Card);
+    fn can_give_card(&self) -> bool;
+    fn give_card(&mut self) -> Card;
     fn active_card(&self) -> Option<Card>;
 }
 
@@ -99,16 +99,16 @@ impl fmt::Display for Foundation {
 }
 
 impl Location for Foundation {
-    fn can_move_to(&self, card: &Card) -> bool {
+    fn can_receive(&self, card: &Card) -> bool {
         (card.suit == self.suit) && (card.rank == self.next_rank())
     }
-    fn move_to(&mut self, card: Card) {
+    fn receive(&mut self, card: Card) {
         self.top_rank = Some(card.rank);
     }
-    fn can_move_from(&self) -> bool {
+    fn can_give_card(&self) -> bool {
         false
     }
-    fn move_from(&mut self) -> Card {
+    fn give_card(&mut self) -> Card {
         match self.top_rank {
             None       => panic!(),
             Some(rank) => {
@@ -142,20 +142,20 @@ impl Column {
 }
 
 impl Location for Column {
-    fn can_move_from(&self) -> bool {
+    fn can_give_card(&self) -> bool {
         !self.cards.is_empty()
     }
-    fn move_from(&mut self) -> Card {
+    fn give_card(&mut self) -> Card {
         self.cards.pop().unwrap()
     }
-    fn can_move_to(&self, card: &Card) -> bool {
+    fn can_receive(&self, card: &Card) -> bool {
         match self.active_card() {
             Some(active_card) =>
                 (active_card.color() != card.color()) && (active_card.rank == card.rank + 1),
             None => true
         }
     }
-    fn move_to(&mut self, card: Card) {
+    fn receive(&mut self, card: Card) {
         self.cards.push(card);
     }
     fn active_card(&self) -> Option<Card> {
@@ -186,10 +186,10 @@ impl fmt::Display for SpotInHand {
 }
 
 impl Location for SpotInHand {
-    fn can_move_from(&self) -> bool {
+    fn can_give_card(&self) -> bool {
         self.card.is_some()
     }
-    fn move_from(&mut self) -> Card {
+    fn give_card(&mut self) -> Card {
         match self.card {
             Some(c) => {
                 let ret = c.clone();
@@ -199,10 +199,10 @@ impl Location for SpotInHand {
             None => panic!(),
         }
     }
-    fn can_move_to(&self, _card: &Card) -> bool {
+    fn can_receive(&self, _card: &Card) -> bool {
         false
     }
-    fn move_to(&mut self, card: Card) {
+    fn receive(&mut self, card: Card) {
         self.card = Some(card);
     }
     fn active_card(&self) -> Option<Card> {
@@ -265,7 +265,7 @@ impl Board {
 
         for (i, column) in columns.iter_mut().enumerate() {
             for _ in 1..(i + 2) {
-                column.move_to(deck.deal());
+                column.receive(deck.deal());
             }
         }
 
@@ -307,15 +307,15 @@ impl Board {
         if !self.permits(m) {
             panic!("Illegal move");
         }
-        let card = self.mut_location_at(m.origin).move_from();
-        self.mut_location_at(m.destination).move_to(card);
+        let card = self.mut_location_at(m.origin).give_card();
+        self.mut_location_at(m.destination).receive(card);
     }
 
     fn permits(&self, m: Move) -> bool {
         let origin = self.location_at(m.origin);
         let destination = self.location_at(m.destination);
         match origin.active_card() {
-            Some(card) => origin.can_move_from() && destination.can_move_to(&card),
+            Some(card) => origin.can_give_card() && destination.can_receive(&card),
             None       => false,
         }
     }
@@ -405,7 +405,8 @@ fn main() {
 
         if board.permits(m) {
             board.execute(m);
-            println!("{}[2J{}", 27 as char, board);
+            let clear_screen = 27 as char;
+            println!("{}[2J{}", clear_screen, board);
         } else {
             println!("That move is not permitted, try again!");
         }
