@@ -80,6 +80,15 @@ struct Foundation {
     top_rank: Option<Rank>,
 }
 
+impl Foundation {
+    fn new(suit: Suit) -> Self {
+        Self { suit: suit, top_rank: None }
+    }
+    fn next_rank(&self) -> Rank {
+        self.top_rank.unwrap_or(0) + 1
+    }
+}
+
 impl fmt::Display for Foundation {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self.top_rank {
@@ -91,13 +100,7 @@ impl fmt::Display for Foundation {
 
 impl Location for Foundation {
     fn can_move_to(&self, card: &Card) -> bool {
-        if card.suit != self.suit {
-            return false;
-        }
-        match self.top_rank {
-            None       => card.rank == 1,
-            Some(rank) => card.rank == rank + 1,
-        }
+        (card.suit == self.suit) && (card.rank == self.next_rank())
     }
     fn move_to(&mut self, card: Card) {
         self.top_rank = Some(card.rank);
@@ -127,6 +130,9 @@ struct Column {
 }
 
 impl Column {
+    fn new() -> Self {
+        Self { cards: Vec::new() }
+    }
     fn printable_card_at(&self, i: usize) -> String {
         match self.cards.get(i) {
             Some(card) => card.to_string(),
@@ -164,6 +170,12 @@ struct SpotInHand {
     card: Option<Card>,
 }
 
+impl SpotInHand {
+    fn new() -> Self {
+        Self { card: None }
+    }
+}
+
 impl fmt::Display for SpotInHand {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self.card {
@@ -175,10 +187,7 @@ impl fmt::Display for SpotInHand {
 
 impl Location for SpotInHand {
     fn can_move_from(&self) -> bool {
-        match self.card {
-            Some(_) => true,
-            None    => false,
-        }
+        self.card.is_some()
     }
     fn move_from(&mut self) -> Card {
         match self.card {
@@ -234,31 +243,24 @@ impl Board {
     fn new() -> Board {
         let mut deck = Deck::new();
         deck.shuffle();
+
         let foundations = [
-            Foundation { suit: Suit::Spades, top_rank: None },
-            Foundation { suit: Suit::Hearts, top_rank: None },
-            Foundation { suit: Suit::Diamonds, top_rank: None },
-            Foundation { suit: Suit::Clubs, top_rank: None },
+            Foundation::new(Suit::Spades),
+            Foundation::new(Suit::Hearts),
+            Foundation::new(Suit::Diamonds),
+            Foundation::new(Suit::Clubs),
         ];
+
         let mut columns = [
-            Column { cards: Vec::new() },
-            Column { cards: Vec::new() },
-            Column { cards: Vec::new() },
-            Column { cards: Vec::new() },
-            Column { cards: Vec::new() },
-            Column { cards: Vec::new() },
-            Column { cards: Vec::new() },
-            Column { cards: Vec::new() },
-            Column { cards: Vec::new() },
-        ];
-        let hand = [
-            SpotInHand { card: Some(deck.deal()) },
-            SpotInHand { card: Some(deck.deal()) },
-            SpotInHand { card: Some(deck.deal()) },
-            SpotInHand { card: Some(deck.deal()) },
-            SpotInHand { card: Some(deck.deal()) },
-            SpotInHand { card: Some(deck.deal()) },
-            SpotInHand { card: Some(deck.deal()) },
+            Column::new(),
+            Column::new(),
+            Column::new(),
+            Column::new(),
+            Column::new(),
+            Column::new(),
+            Column::new(),
+            Column::new(),
+            Column::new(),
         ];
 
         for (i, column) in columns.iter_mut().enumerate() {
@@ -266,6 +268,20 @@ impl Board {
                 column.move_to(deck.deal());
             }
         }
+
+        let mut hand = [
+            SpotInHand::new(),
+            SpotInHand::new(),
+            SpotInHand::new(),
+            SpotInHand::new(),
+            SpotInHand::new(),
+            SpotInHand::new(),
+            SpotInHand::new(),
+        ];
+        for spot in hand.iter_mut() {
+          spot.card = Some(deck.deal());
+        }
+
         Board { foundations: foundations, columns: columns, hand: hand }
     }
 
