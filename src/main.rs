@@ -6,6 +6,12 @@ use std::io::Write;
 use rand::Rng;
 
 #[derive(PartialEq, Clone, Copy)]
+enum VictoryState {
+    Ongoing,
+    Won,
+}
+
+#[derive(PartialEq, Clone, Copy)]
 enum Color {
     Black,
     Red,
@@ -285,6 +291,14 @@ impl Board {
         Board { foundations: foundations, columns: columns, hand: hand }
     }
 
+    fn victory_state(&self) -> VictoryState {
+        if self.foundations.iter().all(|f| f.top_rank.unwrap_or(0) == 13) {
+            VictoryState::Won
+        } else {
+            VictoryState::Ongoing
+        }
+    }
+
     fn mut_location_at(&mut self, label: char) -> &mut Location {
         match label {
             'a' ... 'd' => &mut self.foundations[label as usize - 'a' as usize],
@@ -383,7 +397,7 @@ fn main() {
     let clear_screen = "\x1b[2J\x1b[1;1H";
     println!("{}\n{}", clear_screen, board);
 
-    loop {
+    while board.victory_state() != VictoryState::Won {
         let mut m = Move { origin: 'a', destination: 'a' }; // dummy
 
         loop {
@@ -411,4 +425,5 @@ fn main() {
             println!("That move is not permitted, try again!");
         }
     }
+    println!("{}\n{}\n{}", clear_screen, board, "You won, hooray!");
 }
