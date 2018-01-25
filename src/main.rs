@@ -380,7 +380,8 @@ fn get_char(prompt: &str) -> char {
 
 fn main() {
     let mut board = Board::new();
-    println!("{}[2J{}", 27 as char, board);
+    let clear_screen = "\x1b[2J\x1b[1;1H";
+    println!("{}\n{}", clear_screen, board);
 
     loop {
         let mut m = Move { origin: 'a', destination: 'a' }; // dummy
@@ -405,8 +406,7 @@ fn main() {
 
         if board.permits(m) {
             board.execute(m);
-            let clear_screen = 27 as char;
-            println!("{}[2J{}", clear_screen, board);
+            println!("{}\n{}", clear_screen, board);
         } else {
             println!("That move is not permitted, try again!");
         }
