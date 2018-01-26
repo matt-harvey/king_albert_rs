@@ -1,5 +1,5 @@
 [package]
-name = "king-albert"
+name = "king_albert"
 version = "0.1.0"
 authors = ["Matthew Harvey <software@matthewharvey.net>"]
 

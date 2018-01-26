@@ -18,7 +18,7 @@ version = "0.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
-name = "king-albert"
+name = "king_albert"
 version = "0.1.0"
 dependencies = [
  "rand 0.4.1 (registry+https://github.com/rust-lang/crates.io-index)",
