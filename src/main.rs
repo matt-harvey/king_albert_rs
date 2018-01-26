@@ -317,17 +317,17 @@ impl Board {
         }
     }
 
-    fn execute(&mut self, m: Move) {
-        if !self.permits(m) {
+    fn execute(&mut self, movement: Movement) {
+        if !self.permits(movement) {
             panic!("Illegal move");
         }
-        let card = self.mut_location_at(m.origin).give_card();
-        self.mut_location_at(m.destination).receive(card);
+        let card = self.mut_location_at(movement.origin).give_card();
+        self.mut_location_at(movement.destination).receive(card);
     }
 
-    fn permits(&self, m: Move) -> bool {
-        let origin = self.location_at(m.origin);
-        let destination = self.location_at(m.destination);
+    fn permits(&self, movement: Movement) -> bool {
+        let origin = self.location_at(movement.origin);
+        let destination = self.location_at(movement.destination);
         match origin.active_card() {
             Some(card) => origin.can_give_card() && destination.can_receive(&card),
             None       => false,
@@ -369,7 +369,7 @@ impl fmt::Display for Board {
 }
 
 #[derive(Copy, Clone)]
-struct Move {
+struct Movement {
     origin: char,
     destination: char,
 }
@@ -398,12 +398,12 @@ fn main() {
     println!("{}\n{}", clear_screen, board);
 
     while board.victory_state() != VictoryState::Won {
-        let mut m = Move { origin: 'a', destination: 'a' }; // dummy
+        let mut movement = Movement { origin: 'a', destination: 'a' }; // dummy
 
         loop {
             let c = get_char("\nEnter position to move FROM (labelled e-t): ");
             if c >= 'e' && c <= 't' {
-                m.origin = c;
+                movement.origin = c;
                 break;
             }
             println!("You must enter a letter from e to t");
@@ -412,14 +412,14 @@ fn main() {
         loop {
             let c = get_char("\nEnter position to move TO (labelled a-m): ");
             if c >= 'a' && c <= 'm' {
-                m.destination = c;
+                movement.destination = c;
                 break;
             }
             println!("You must enter a letter from a to m");
         }
 
-        if board.permits(m) {
-            board.execute(m);
+        if board.permits(movement) {
+            board.execute(movement);
             println!("{}\n{}", clear_screen, board);
         } else {
             println!("That move is not permitted, try again!");
