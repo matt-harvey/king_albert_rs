@@ -1,8 +1,6 @@
 use std::fmt;
 
-use card::Card;
-use card::Rank;
-use card::Suit;
+use card::{Card, Rank, Suit};
 use deck::Deck;
 use victory_state::VictoryState;
 

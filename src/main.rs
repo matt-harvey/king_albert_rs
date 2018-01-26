@@ -3,8 +3,7 @@ extern crate king_albert;
 use std::io;
 use std::io::Write;
 
-use king_albert::board::Board;
-use king_albert::board::Movement;
+use king_albert::board::{Board, Movement};
 use king_albert::victory_state::VictoryState;
 
 fn get_char(prompt: &str) -> char {

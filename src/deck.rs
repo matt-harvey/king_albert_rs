@@ -2,8 +2,7 @@ extern crate rand;
 
 use rand::Rng;
 
-use card::Card;
-use card::Suit;
+use card::{Card, Suit};
 
 pub struct Deck {
     cards: Vec<Card>,
