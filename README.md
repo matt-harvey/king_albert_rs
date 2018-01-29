@@ -13,7 +13,7 @@ Do this from within the project root:
 
 ```
 cargo build --release
-./target/release/king-albert
+./target/release/king_albert
 ```
 
 You've won when the only cards you can see are kings.
