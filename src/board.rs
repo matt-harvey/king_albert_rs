@@ -11,7 +11,7 @@ pub struct Board {
 }
 
 impl Board {
-    pub fn new() -> Board {
+    pub fn new() -> Self {
         let mut deck = Deck::new();
         deck.shuffle();
 
@@ -53,7 +53,7 @@ impl Board {
           spot.card = Some(deck.deal());
         }
 
-        Board { foundations: foundations, columns: columns, hand: hand }
+        Self { foundations: foundations, columns: columns, hand: hand }
     }
 
     pub fn victory_state(&self) -> VictoryState {
