@@ -24,31 +24,35 @@ fn get_char(prompt: &str) -> char {
     }
 }
 
+fn get_movement_origin() -> char {
+    loop {
+        let c = get_char("\nEnter position to move FROM (labelled e-t): ");
+        if c >= 'e' && c <= 't' {
+            return c;
+        }
+        println!("You must enter a letter from e to t");
+    }
+}
+
+fn get_movement_destination() -> char {
+    loop {
+        let c = get_char("\nEnter position to move TO (labelled a-m): ");
+        if c >= 'a' && c <= 'm' {
+            return c;
+        }
+        println!("You must enter a letter from a to m");
+    }
+}
+
 fn main() {
     let mut board = Board::new();
     let clear_screen = "\x1b[2J\x1b[1;1H";
     println!("{}\n{}", clear_screen, board);
 
     while board.victory_state() != VictoryState::Won {
-        let mut movement = Movement { origin: 'a', destination: 'a' }; // dummy
-
-        loop {
-            let c = get_char("\nEnter position to move FROM (labelled e-t): ");
-            if c >= 'e' && c <= 't' {
-                movement.origin = c;
-                break;
-            }
-            println!("You must enter a letter from e to t");
-        }
-
-        loop {
-            let c = get_char("\nEnter position to move TO (labelled a-m): ");
-            if c >= 'a' && c <= 'm' {
-                movement.destination = c;
-                break;
-            }
-            println!("You must enter a letter from a to m");
-        }
+        let origin = get_movement_origin();
+        let destination = get_movement_destination();
+        let movement = Movement { origin: origin, destination: destination };
 
         if board.permits(movement) {
             board.execute(movement);
