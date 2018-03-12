@@ -24,23 +24,13 @@ fn get_char(prompt: &str) -> char {
     }
 }
 
-fn get_movement_origin() -> char {
+fn get_movement_component(prompt: &str, min: char, max: char) -> char {
     loop {
-        let c = get_char("\nEnter position to move FROM (labelled e-t): ");
-        if c >= 'e' && c <= 't' {
+        let c = get_char(prompt);
+        if c >= min && c <= max {
             return c;
         }
-        println!("You must enter a letter from e to t");
-    }
-}
-
-fn get_movement_destination() -> char {
-    loop {
-        let c = get_char("\nEnter position to move TO (labelled a-m): ");
-        if c >= 'a' && c <= 'm' {
-            return c;
-        }
-        println!("You must enter a letter from a to m");
+        println!("You must enter a letter from {} to {}", min, max);
     }
 }
 
@@ -50,8 +40,8 @@ fn main() {
     println!("{}\n{}", clear_screen, board);
 
     while board.victory_state() != VictoryState::Won {
-        let origin = get_movement_origin();
-        let destination = get_movement_destination();
+        let origin = get_movement_component("\nEnter position to move FROM (labelled e-t): ", 'e', 't');
+        let destination = get_movement_component("\nEnter position to move TO (labelled a-m): ", 'a', 'm');
         let movement = Movement { origin: origin, destination: destination };
 
         if board.permits(movement) {
