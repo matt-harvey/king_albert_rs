@@ -18,7 +18,7 @@ cargo build --release
 
 You've won when the only cards you can see are kings.
 
-Note King Albert is often not winnable. Just CTRL-C to given up and try again :)
+Note King Albert is often not winnable. Just CTRL-C to give up and try again :)
 
 ## License
 
