@@ -5,9 +5,9 @@ use deck::Deck;
 use victory_state::VictoryState;
 
 pub struct Board {
-    foundations: [Foundation; 4],
-    columns: [Column; 9],
-    hand: [SpotInHand; 7],
+    foundations: Vec<Foundation>,
+    columns: Vec<Column>,
+    hand: Vec<SpotInHand>,
 }
 
 impl Board {
@@ -15,43 +15,17 @@ impl Board {
         let mut deck = Deck::new();
         deck.shuffle();
 
-        let foundations = [
-            Foundation::new(Suit::Spades),
-            Foundation::new(Suit::Hearts),
-            Foundation::new(Suit::Diamonds),
-            Foundation::new(Suit::Clubs),
-        ];
+        let foundations = Suit::iterator().map(|suit| Foundation::new(*suit)).collect();
 
-        let mut columns = [
-            Column::new(),
-            Column::new(),
-            Column::new(),
-            Column::new(),
-            Column::new(),
-            Column::new(),
-            Column::new(),
-            Column::new(),
-            Column::new(),
-        ];
-
-        for (i, column) in columns.iter_mut().enumerate() {
+        let columns = (0..9).map(|i| {
+            let mut column = Column::new();
             for _ in 1..(i + 2) {
                 column.receive(deck.deal());
             }
-        }
+            column
+        }).collect();
 
-        let mut hand = [
-            SpotInHand::new(),
-            SpotInHand::new(),
-            SpotInHand::new(),
-            SpotInHand::new(),
-            SpotInHand::new(),
-            SpotInHand::new(),
-            SpotInHand::new(),
-        ];
-        for spot in hand.iter_mut() {
-          spot.card = Some(deck.deal());
-        }
+        let hand = (0..7).map(|_| SpotInHand::new(deck.deal())).collect();
 
         Self { foundations: foundations, columns: columns, hand: hand }
     }
@@ -158,18 +132,18 @@ impl Foundation {
 impl fmt::Display for Foundation {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self.top_rank {
-          None       => write!(f,"  {}", self.suit),
-          Some(rank) => write!(f, "{}", Card { rank: rank, suit: self.suit }),
+          None       => write!(f, "  {}", self.suit),
+          Some(rank) => write!(f, "{}", Card::new(self.suit, rank)),
         }
     }
 }
 
 impl Location for Foundation {
     fn can_receive(&self, card: &Card) -> bool {
-        (card.suit == self.suit) && (card.rank == self.next_rank())
+        (card.suit() == self.suit) && (card.rank() == self.next_rank())
     }
     fn receive(&mut self, card: Card) {
-        self.top_rank = Some(card.rank);
+        self.top_rank = Some(card.rank());
     }
     fn can_give_card(&self) -> bool {
         false
@@ -179,14 +153,14 @@ impl Location for Foundation {
             None       => panic!(),
             Some(rank) => {
                 self.top_rank = Some(rank - 1);
-                Card { suit: self.suit, rank: rank }
+                Card::new(self.suit, rank)
             },
         }
     }
     fn active_card(&self) -> Option<Card> {
         match self.top_rank {
             None       => None,
-            Some(rank) => Some(Card { suit: self.suit, rank: rank }),
+            Some(rank) => Some(Card::new(self.suit, rank)),
         }
     }
 }
@@ -217,7 +191,7 @@ impl Location for Column {
     fn can_receive(&self, card: &Card) -> bool {
         match self.active_card() {
             Some(active_card) =>
-                (active_card.color() != card.color()) && (active_card.rank == card.rank + 1),
+                (active_card.color() != card.color()) && (active_card.rank() == card.rank() + 1),
             None => true
         }
     }
@@ -237,8 +211,8 @@ struct SpotInHand {
 }
 
 impl SpotInHand {
-    fn new() -> Self {
-        Self { card: None }
+    fn new(card: Card) -> Self {
+        Self { card: Some(card) }
     }
 }
 

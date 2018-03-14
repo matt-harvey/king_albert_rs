@@ -12,10 +12,9 @@ impl Deck {
     pub fn new() -> Self {
         let mut cards = Vec::new();
         for rank in 1..14 {
-            cards.push(Card { rank: rank, suit: Suit::Spades });
-            cards.push(Card { rank: rank, suit: Suit::Hearts });
-            cards.push(Card { rank: rank, suit: Suit::Diamonds });
-            cards.push(Card { rank: rank, suit: Suit::Clubs });
+            for suit in Suit::iterator() {
+                cards.push(Card::new(*suit, rank))
+            }
         }
         Deck { cards: cards }
     }
