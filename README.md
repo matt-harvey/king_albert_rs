@@ -9,6 +9,8 @@ I wrote this mainly to help me learn Rust. It is quite unpolished.
 
 You need Rust and Cargo.
 
+Note King Albert has been tested on Mac OSX and Linux, but not on Windows.
+
 Do this from within the project root:
 
 ```
