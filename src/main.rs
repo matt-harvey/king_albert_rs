@@ -1,10 +1,10 @@
-extern crate king_albert;
+extern crate king_albert_rs;
 
 use std::io;
 use std::io::Write;
 
-use king_albert::board::{Board, Movement};
-use king_albert::victory_state::VictoryState;
+use king_albert_rs::board::{Board, Movement};
+use king_albert_rs::victory_state::VictoryState;
 
 fn get_char(prompt: &str) -> char {
     loop {
