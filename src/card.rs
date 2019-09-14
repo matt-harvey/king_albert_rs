@@ -28,7 +28,7 @@ impl fmt::Display for Card {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self.rank() {
             1       => write!(f, " A{}", self.suit()),
-            2 ... 9 => write!(f, " {}{}", self.rank(), self.suit()),
+            2 ..= 9 => write!(f, " {}{}", self.rank(), self.suit()),
             10      => write!(f, "10{}", self.suit()),
             11      => write!(f, " J{}", self.suit()),
             12      => write!(f, " Q{}", self.suit()),

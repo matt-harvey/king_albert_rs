@@ -40,18 +40,18 @@ impl Board {
 
     fn mut_location_at(&mut self, label: char) -> &mut Location {
         match label {
-            'a' ... 'd' => &mut self.foundations[label as usize - 'a' as usize],
-            'e' ... 'm' => &mut self.columns[label as usize - 'e' as usize],
-            'n' ... 't' => &mut self.hand[label as usize - 'n' as usize],
+            'a' ..= 'd' => &mut self.foundations[label as usize - 'a' as usize],
+            'e' ..= 'm' => &mut self.columns[label as usize - 'e' as usize],
+            'n' ..= 't' => &mut self.hand[label as usize - 'n' as usize],
             _           => panic!("Label outside range"),
         }
     }
 
     fn location_at(&self, label: char) -> &Location {
         match label {
-            'a' ... 'd' => &self.foundations[label as usize - 'a' as usize],
-            'e' ... 'm' => &self.columns[label as usize - 'e' as usize],
-            'n' ... 't' => &self.hand[label as usize - 'n' as usize],
+            'a' ..= 'd' => &self.foundations[label as usize - 'a' as usize],
+            'e' ..= 'm' => &self.columns[label as usize - 'e' as usize],
+            'n' ..= 't' => &self.hand[label as usize - 'n' as usize],
             _           => panic!("Label outside range"),
         }
     }
