@@ -38,7 +38,7 @@ impl Board {
         }
     }
 
-    fn mut_location_at(&mut self, label: char) -> &mut Location {
+    fn mut_location_at(&mut self, label: char) -> &mut dyn Location {
         match label {
             'a' ..= 'd' => &mut self.foundations[label as usize - 'a' as usize],
             'e' ..= 'm' => &mut self.columns[label as usize - 'e' as usize],
@@ -47,7 +47,7 @@ impl Board {
         }
     }
 
-    fn location_at(&self, label: char) -> &Location {
+    fn location_at(&self, label: char) -> &dyn Location {
         match label {
             'a' ..= 'd' => &self.foundations[label as usize - 'a' as usize],
             'e' ..= 'm' => &self.columns[label as usize - 'e' as usize],
