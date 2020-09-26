@@ -4,4 +4,5 @@ version = "0.1.0"
 authors = ["Matthew Harvey <software@matthewharvey.net>"]
 
 [dependencies]
-rand = "0.4"
+rand = "0.7"
+staticvec = "0.10.5"

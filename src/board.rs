@@ -2,30 +2,36 @@ use std::fmt;
 
 use card::{Card, Rank, Suit};
 use deck::Deck;
+use staticvec::StaticVec;
 use victory_state::VictoryState;
 
+// FIXME All the magic numbers
+
 pub struct Board {
-    foundations: Vec<Foundation>,
-    columns: Vec<Column>,
-    hand: Vec<SpotInHand>,
+    foundations: StaticVec<Foundation, 4>,
+    columns: StaticVec<Column, 9>,
+    hand: StaticVec<SpotInHand, 7>,
 }
 
 impl Board {
-    pub fn new() -> Self {
-        let mut deck = Deck::new();
-        deck.shuffle();
-
+    pub fn new(deck: &Deck) -> Self {
         let foundations = Suit::iterator().map(|suit| Foundation::new(*suit)).collect();
 
+        let mut card_index = 0;
         let columns = (0..9).map(|i| {
-            let mut column = Column::new();
+            let mut column = Column::new(i + 4);
             for _ in 1..(i + 2) {
-                column.receive(deck.deal());
+                column.receive(deck.deal(card_index));
+                card_index += 1;
             }
             column
         }).collect();
 
-        let hand = (0..7).map(|_| SpotInHand::new(deck.deal())).collect();
+        let hand = (0..7).map(|_| {
+            let spot = SpotInHand::new(deck.deal(card_index));
+            card_index += 1;
+            spot
+        }).collect();
 
         Self { foundations: foundations, columns: columns, hand: hand }
     }
@@ -56,21 +62,41 @@ impl Board {
         }
     }
 
-    pub fn execute(&mut self, movement: Movement) {
-        if !self.permits(movement) {
-            panic!("Illegal move");
-        }
+    pub fn execute(&mut self, movement: &Movement) {
         let card = self.mut_location_at(movement.origin).give_card();
         self.mut_location_at(movement.destination).receive(card);
     }
 
-    pub fn permits(&self, movement: Movement) -> bool {
+    pub fn permits(&self, movement: &Movement) -> bool {
         let origin = self.location_at(movement.origin);
         let destination = self.location_at(movement.destination);
         match origin.active_card() {
             Some(card) => origin.can_give_card() && destination.can_receive(&card),
             None       => false,
         }
+    }
+
+    pub fn permitted_moves(&self) -> Vec<Movement> {
+        let mut moves = Vec::new();
+        // FIXME Knowledge of the valid ranges is duplicated a lot
+        for origin_label in b'e'..=b't' {
+            let origin_char = char::from(origin_label);
+            let origin = self.location_at(origin_char);
+            match origin.active_card() {
+                None => continue,
+                Some(card) =>
+                    if origin.can_give_card() {
+                        for destination_label in b'a'..=b'm' {
+                            let destination_char = char::from(destination_label);
+                            let destination = self.location_at(destination_char);
+                            if destination.can_receive(&card) {
+                                moves.push(Movement { origin: origin_char, destination: destination_char });
+                            }
+                        }
+                    }
+            }
+        }
+        moves
     }
 }
 
@@ -170,8 +196,8 @@ struct Column {
 }
 
 impl Column {
-    fn new() -> Self {
-        Self { cards: Vec::new() }
+    fn new(initial_capacity: usize) -> Self {
+        Self { cards: Vec::with_capacity(initial_capacity) } // FIXME magic number
     }
     fn printable_card_at(&self, i: usize) -> String {
         match self.cards.get(i) {
@@ -232,7 +258,7 @@ impl Location for SpotInHand {
     fn give_card(&mut self) -> Card {
         match self.card {
             Some(c) => {
-                let ret = c.clone();
+                let ret = c;
                 self.card = None;
                 ret
             },

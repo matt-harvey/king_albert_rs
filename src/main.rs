@@ -1,9 +1,11 @@
 extern crate king_albert_rs;
+extern crate rand;
 
 use std::io;
 use std::io::Write;
 
 use king_albert_rs::board::{Board, Movement};
+use king_albert_rs::shuffle_search::find_winnable_deck;
 use king_albert_rs::victory_state::VictoryState;
 
 fn get_char(prompt: &str) -> char {
@@ -35,7 +37,8 @@ fn get_movement_component(prompt: &str, min: char, max: char) -> char {
 }
 
 fn main() {
-    let mut board = Board::new();
+    let mut deck = find_winnable_deck();
+    let mut board = Board::new(&mut deck);
     let clear_screen = "\x1b[2J\x1b[1;1H";
     println!("{}\n{}", clear_screen, board);
 
@@ -44,8 +47,8 @@ fn main() {
         let destination = get_movement_component("\nEnter position to move TO (labelled a-m): ", 'a', 'm');
         let movement = Movement { origin: origin, destination: destination };
 
-        if board.permits(movement) {
-            board.execute(movement);
+        if board.permits(&movement) {
+            board.execute(&movement);
             println!("{}\n{}", clear_screen, board);
         } else {
             println!("That move is not permitted, try again!");

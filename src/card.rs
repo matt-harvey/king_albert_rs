@@ -1,17 +1,17 @@
 use std::fmt;
 use std::slice::Iter;
 
-pub type Rank = u8;
-
-#[derive(Copy, Clone)]
+#[derive(Clone, Copy)]
 pub struct Card {
-    suit: Suit,
     rank: Rank,
+    suit: Suit,
 }
+
+pub type Rank = u8;
 
 impl Card {
     pub fn new(suit: Suit, rank: Rank) -> Self {
-        Self { suit: suit, rank: rank }
+        Self { rank, suit }
     }
     pub fn suit(&self) -> Suit {
         self.suit
@@ -52,10 +52,11 @@ pub enum Suit {
     Clubs,
 }
 
+const SUITS: [Suit; 4] = [Suit::Spades, Suit::Hearts, Suit::Diamonds, Suit::Clubs];
+
 impl Suit {
     pub fn iterator() -> Iter<'static, Self> {
-        static SUITS: [Suit; 4] = [Suit::Spades, Suit::Hearts, Suit::Diamonds, Suit::Clubs];
-        SUITS.into_iter()
+        SUITS.iter()
     }
     fn color(self) -> Color {
         match self {
