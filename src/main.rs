@@ -3,6 +3,7 @@ extern crate rand;
 
 use std::io;
 use std::io::Write;
+use std::{thread, time};
 
 use king_albert_rs::board::{Board, Movement};
 use king_albert_rs::shuffle_search::find_winnable_deck;
@@ -37,22 +38,28 @@ fn get_movement_component(prompt: &str, min: char, max: char) -> char {
 }
 
 fn main() {
-    let mut deck = find_winnable_deck();
+    let (mut deck, movements) = find_winnable_deck();
     let mut board = Board::new(&mut deck);
     let clear_screen = "\x1b[2J\x1b[1;1H";
     println!("{}\n{}", clear_screen, board);
 
-    while board.victory_state() != VictoryState::Won {
-        let origin = get_movement_component("\nEnter position to move FROM (labelled e-t): ", 'e', 't');
-        let destination = get_movement_component("\nEnter position to move TO (labelled a-m): ", 'a', 'm');
-        let movement = Movement { origin: origin, destination: destination };
-
-        if board.permits(&movement) {
-            board.execute(&movement);
-            println!("{}\n{}", clear_screen, board);
-        } else {
-            println!("That move is not permitted, try again!");
-        }
+    for movement in movements.iter() {
+        thread::sleep(time::Duration::from_millis(500));
+        board.execute(&movement);
+        println!("{}\n{}", clear_screen, board);
     }
-    println!("{}\n{}\n{}", clear_screen, board, "You won, hooray!");
+
+//    while board.victory_state() != VictoryState::Won {
+//        let origin = get_movement_component("\nEnter position to move FROM (labelled e-t): ", 'e', 't');
+//        let destination = get_movement_component("\nEnter position to move TO (labelled a-m): ", 'a', 'm');
+//        let movement = Movement { origin: origin, destination: destination };
+
+//        if board.permits(&movement) {
+//            board.execute(&movement);
+//            println!("{}\n{}", clear_screen, board);
+//        } else {
+//            println!("That move is not permitted, try again!");
+//        }
+//    }
+//    println!("{}\n{}\n{}", clear_screen, board, "You won, hooray!");
 }
