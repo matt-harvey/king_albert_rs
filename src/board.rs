@@ -3,6 +3,7 @@ use std::fmt;
 use card::{Card, Rank, Suit};
 use deck::Deck;
 use staticvec::StaticVec;
+use std::sync::Arc;
 use victory_state::VictoryState;
 
 // FIXME All the magic numbers
@@ -14,7 +15,7 @@ pub struct Board {
 }
 
 impl Board {
-    pub fn new(deck: &Deck) -> Self {
+    pub fn new(deck: Arc<Box<Deck>>) -> Self {
         let foundations = Suit::iterator().map(|suit| Foundation::new(*suit)).collect();
 
         let mut card_index = 0;
