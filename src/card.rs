@@ -1,6 +1,9 @@
 use std::fmt;
 use std::slice::Iter;
 
+pub const NUM_SUITS: usize = 4;
+pub const MAX_RANK: u8 = 13;
+
 #[derive(Clone, Copy)]
 pub struct Card {
     rank: Rank,
@@ -27,13 +30,13 @@ impl Card {
 impl fmt::Display for Card {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self.rank() {
-            1       => write!(f, " A{}", self.suit()),
-            2 ..= 9 => write!(f, " {}{}", self.rank(), self.suit()),
-            10      => write!(f, "10{}", self.suit()),
-            11      => write!(f, " J{}", self.suit()),
-            12      => write!(f, " Q{}", self.suit()),
-            13      => write!(f, " K{}", self.suit()),
-            _       => panic!(),
+            1        => write!(f, " A{}", self.suit()),
+            2 ..= 9  => write!(f, " {}{}", self.rank(), self.suit()),
+            10       => write!(f, "10{}", self.suit()),
+            11       => write!(f, " J{}", self.suit()),
+            12       => write!(f, " Q{}", self.suit()),
+            MAX_RANK => write!(f, " K{}", self.suit()),
+            _        => panic!(),
         }
     }
 }
@@ -52,7 +55,7 @@ pub enum Suit {
     Clubs,
 }
 
-const SUITS: [Suit; 4] = [Suit::Spades, Suit::Hearts, Suit::Diamonds, Suit::Clubs];
+const SUITS: [Suit; NUM_SUITS] = [Suit::Spades, Suit::Hearts, Suit::Diamonds, Suit::Clubs];
 
 impl Suit {
     pub fn iterator() -> Iter<'static, Self> {

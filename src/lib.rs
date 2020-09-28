@@ -1,3 +1,4 @@
+extern crate num_cpus;
 extern crate rand;
 extern crate staticvec;
 

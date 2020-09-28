@@ -1,17 +1,18 @@
 use std::fmt;
 
-use card::{Card, Rank, Suit};
+use card::{Card, MAX_RANK, NUM_SUITS, Rank, Suit};
 use deck::Deck;
 use staticvec::StaticVec;
 use std::sync::Arc;
 use victory_state::VictoryState;
 
-// FIXME All the magic numbers
+const NUM_COLUMNS: usize = 9;
+const NUM_SPOTS_IN_HAND: usize = 7;
 
 pub struct Board {
-    foundations: StaticVec<Foundation, 4>,
-    columns: StaticVec<Column, 9>,
-    hand: StaticVec<SpotInHand, 7>,
+    foundations: StaticVec<Foundation, NUM_SUITS>,
+    columns: StaticVec<Column, NUM_COLUMNS>,
+    hand: StaticVec<SpotInHand, NUM_SPOTS_IN_HAND>,
 }
 
 impl Board {
@@ -19,16 +20,17 @@ impl Board {
         let foundations = Suit::iterator().map(|suit| Foundation::new(*suit)).collect();
 
         let mut card_index = 0;
-        let columns = (0..9).map(|i| {
-            let mut column = Column::new(i + 4);
-            for _ in 1..(i + 2) {
+        let columns = (1..=NUM_COLUMNS).map(|i| {
+            let preallocated_column_capacity = i + 5;
+            let mut column = Column::new(preallocated_column_capacity);
+            for _ in 1..=i {
                 column.receive(deck.deal(card_index));
                 card_index += 1;
             }
             column
         }).collect();
 
-        let hand = (0..7).map(|_| {
+        let hand = (0..NUM_SPOTS_IN_HAND).map(|_| {
             let spot = SpotInHand::new(deck.deal(card_index));
             card_index += 1;
             spot
@@ -38,7 +40,7 @@ impl Board {
     }
 
     pub fn victory_state(&self) -> VictoryState {
-        if self.foundations.iter().all(|f| f.top_rank.unwrap_or(0) == 13) {
+        if self.foundations.iter().all(|f| f.top_rank.unwrap_or(0) == MAX_RANK) {
             VictoryState::Won
         } else {
             VictoryState::Ongoing
@@ -198,7 +200,7 @@ struct Column {
 
 impl Column {
     fn new(initial_capacity: usize) -> Self {
-        Self { cards: Vec::with_capacity(initial_capacity) } // FIXME magic number
+        Self { cards: Vec::with_capacity(initial_capacity) }
     }
     fn printable_card_at(&self, i: usize) -> String {
         match self.cards.get(i) {

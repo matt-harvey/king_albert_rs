@@ -4,9 +4,8 @@ use rand::{seq::IteratorRandom, thread_rng};
 use std::{sync::{mpsc, Arc}, thread};
 use victory_state::VictoryState;
 
-const MAX_MOVES: u32 = 700;
-const MAX_THREADS: u32 = 8; // FIXME Should be based on the number of cores available
-const MAX_REPEATS: u32 = 3200;
+const MAX_MOVES: usize = 700;
+const MAX_REPEATS: usize = 3200;
 
 type WinningMoves = Vec<Movement>;
 
@@ -18,11 +17,12 @@ fn shuffled_deck() -> Deck {
 
 pub fn find_winnable_deck() -> (Deck, Vec<Movement>) {
     let mut i = 0;
+    let num_threads = num_cpus::get();
     loop {
-        println!("\n{} decks tried", i); // DEBUG
+        println!("{} decks tried", i); // DEBUG
         let deck = shuffled_deck();
         let deck_ref = Arc::new(Box::new(deck.clone()));
-        if let Some(movements) = can_find_win(deck_ref) {
+        if let Some(movements) = can_find_win(deck_ref, num_threads) {
             return (deck, movements);
         } else {
             i += 1
@@ -30,7 +30,7 @@ pub fn find_winnable_deck() -> (Deck, Vec<Movement>) {
     }
 }
 
-fn make_random_move(board: &mut Board, offset: u32) -> Option<Movement> {
+fn make_random_move(board: &mut Board, offset: usize) -> Option<Movement> {
     let permitted_moves = board.permitted_moves();
     if permitted_moves.is_empty() {
         None
@@ -45,18 +45,17 @@ fn make_random_move(board: &mut Board, offset: u32) -> Option<Movement> {
     }
 }
 
-fn can_find_win(deck: Arc<Box<Deck>>) -> Option<Vec<Movement>> {
-    for j in 0..MAX_REPEATS {
-        print!("\r{} repeats", j); // DEBUG
+fn can_find_win(deck: Arc<Box<Deck>>, num_threads: usize) -> Option<Vec<Movement>> {
+    for _ in 0..MAX_REPEATS {
         let (sender, receiver) = mpsc::channel();
-        for i in 0..MAX_THREADS {
+        for i in 0..num_threads {
             let sender_n = sender.clone();
             let deck_clone: Arc<Box<Deck>> = Arc::clone(&deck);
             thread::spawn(move || {
                 try_deck(sender_n, deck_clone, i);
             });
         }
-        for _ in 0..MAX_THREADS {
+        for _ in 0..num_threads {
             let result = receiver.recv().unwrap();
             if let Some(_) = result {
                 return result;
@@ -66,7 +65,7 @@ fn can_find_win(deck: Arc<Box<Deck>>) -> Option<Vec<Movement>> {
     None
 }
 
-fn try_deck(sender: mpsc::Sender<Option<WinningMoves>>, deck: Arc<Box<Deck>>, offset: u32) {
+fn try_deck(sender: mpsc::Sender<Option<WinningMoves>>, deck: Arc<Box<Deck>>, offset: usize) {
     let mut board = Board::new(deck);
     let mut moves = Vec::new();
     for j in 0..MAX_MOVES {
