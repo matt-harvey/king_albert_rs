@@ -1,7 +1,10 @@
 use board::{Board, Movement};
 use deck::Deck;
 use rand::{seq::IteratorRandom, thread_rng};
-use std::{sync::{mpsc, Arc}, thread};
+use std::io;
+use std::io::prelude::*;
+use std::{sync::{mpsc, Arc}};
+use std::thread;
 use victory_state::VictoryState;
 
 const MAX_MOVES: usize = 700;
@@ -19,7 +22,9 @@ pub fn find_winnable_deck() -> (Deck, Vec<Movement>) {
     let mut i = 0;
     let num_threads = num_cpus::get();
     loop {
-        println!("{} decks tried", i); // DEBUG
+        print!("\rSearching for a winnable deal. Please wait.");
+        for _ in 0..i { print!(".") }
+        io::stdout().flush().ok().expect("Could not flush stdout");
         let deck = shuffled_deck();
         let deck_ref = Arc::new(Box::new(deck.clone()));
         if let Some(movements) = can_find_win(deck_ref, num_threads) {
