@@ -1,8 +1,7 @@
 use std::fmt;
 
-use card::{Card, MAX_RANK, NUM_SUITS, Rank, Suit};
+use card::{Card, MAX_RANK, Rank, Suit};
 use deck::Deck;
-use staticvec::StaticVec;
 use std::sync::Arc;
 use victory_state::VictoryState;
 
@@ -10,9 +9,9 @@ const NUM_COLUMNS: usize = 9;
 const NUM_SPOTS_IN_HAND: usize = 7;
 
 pub struct Board {
-    foundations: StaticVec<Foundation, NUM_SUITS>,
-    columns: StaticVec<Column, NUM_COLUMNS>,
-    hand: StaticVec<SpotInHand, NUM_SPOTS_IN_HAND>,
+    foundations: Vec<Foundation>,
+    columns: Vec<Column>,
+    hand: Vec<SpotInHand>,
 }
 
 impl Board {

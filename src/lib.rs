@@ -1,6 +1,5 @@
 extern crate num_cpus;
 extern crate rand;
-extern crate staticvec;
 
 pub mod board;
 pub mod card;

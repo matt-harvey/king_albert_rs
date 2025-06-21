@@ -6,4 +6,3 @@ authors = ["Matthew Harvey <software@matthewharvey.net>"]
 [dependencies]
 num_cpus = "1.13.0"
 rand = "0.7"
-staticvec = "0.10.5"

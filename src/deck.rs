@@ -2,16 +2,15 @@ extern crate rand;
 
 use card::{Card, Suit};
 use rand::{seq::SliceRandom, thread_rng};
-use staticvec::StaticVec;
 
 #[derive(Clone)]
 pub struct Deck {
-    cards: StaticVec<Card, 52>,
+    cards: Vec<Card>,
 }
 
 impl Deck {
     pub fn new() -> Self {
-        let mut cards = StaticVec::new();
+        let mut cards = Vec::new();
         for rank in 1..=13 {
             for suit in Suit::iterator() {
                 cards.push(Card::new(*suit, rank))
